@@ -1,0 +1,61 @@
+<?php
+
+namespace App\Notifications;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\BroadcastMessage;
+
+class NewCourseAdded extends Notification
+{
+    use Queueable;
+
+      protected $course;
+
+    public function __construct($course)
+    {
+        $this->course = $course;
+    }
+
+    public function via($notifiable)
+    {
+        return ['broadcast', 'database'];
+    }
+
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage([
+            'message' => "تم إضافة كورس جديد: {$this->course->name}",
+            'course_id' => $this->course->id,
+        ]);
+    }
+
+    public function toDatabase($notifiable)
+    {
+        return [
+            'message' => "تم إضافة كورس جديد: {$this->course->name}",
+            'course_id' => $this->course->id,
+        ];
+    }
+    public function toMail(object $notifiable): MailMessage
+    {
+        return (new MailMessage)
+                    ->line('The introduction to the notification.')
+                    ->action('Notification Action', url('/'))
+                    ->line('Thank you for using our application!');
+    }
+
+    /**
+     * Get the array representation of the notification.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(object $notifiable): array
+    {
+        return [
+            //
+        ];
+    }
+}
