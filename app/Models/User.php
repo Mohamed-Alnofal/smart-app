@@ -34,7 +34,7 @@ protected $fillable = [
     'last_name',
     'phone_number',
     'gender',
-    'age',
+    'birthday',
     'role_id',
 ];
 
@@ -60,20 +60,6 @@ protected $fillable = [
     ];
 
 //belongsto
- public function student()
-{
-    return $this->hasMany(Student::class);
-}
-
-public function admin()
-{
-    return $this->hasOne(Admin::class);
-}
-
-public function manager()
-{
-    return $this->hasMany(Manager::class);
-}
 public function role()
 {
     return $this->belongsTo(Role::class);
@@ -81,13 +67,19 @@ public function role()
 
 public function courses()
 {
-    return $this->hasMany(Course::class);
+    return $this->hasMany(Level_Course::class);
 }
 
 public function enrollments()
 {
     return $this->hasMany(Enrollment::class);
 }
+
+public function scholarships()
+{
+    return $this->hasMany(Scholarship::class);
+}
+
 // public function sendPasswordResetNotification($token)
 // {
 //     $this->notify(new ResetPassword($token));

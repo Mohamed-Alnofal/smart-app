@@ -7,7 +7,7 @@ use App\Models\Enrollment;
 use App\Models\Level;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-
+use App\Events\CourseCreated;
 class CourseLevelController extends Controller
 {
       // ==========================
@@ -47,6 +47,8 @@ public function showCourse($id)
         $validated['user_id'] = auth()->id(); // Attach to logged-in user
 
         $course = Course::create($validated);
+            // إطلاق الحدث
+        event(new CourseCreated($course));
         return response()->json($course, 201);
     }
 

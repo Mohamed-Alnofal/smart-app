@@ -23,21 +23,52 @@ class RoleSeeder extends Seeder
         $adminRoleId = DB::table('roles')->where('name', 'admin')->value('id');
         $managerRoleId = DB::table('roles')->where('name', 'manager')->value('id');
 
-       // إنشاء حساب الأدمن
-        User::firstOrCreate(
+    //    // إنشاء حساب الأدمن
+    //     User::firstOrCreate(
+    //         ['email' => 'admin@example.com'],
+    //         [
+    //             'password' => Hash::make('password123'),
+    //             'role_id' => $adminRoleId,
+    //         ]
+    //     );
+
+    //     // إنشاء حساب المدير
+    //     User::firstOrCreate(
+    //         ['email' => 'manager@example.com'],
+    //         [
+    //             'password' => Hash::make('password123'),
+    //             'role_id' => $managerRoleId,
+    //         ]
+    //     );
+     // إنشاء حساب admin إذا لم يكن موجود
+        DB::table('users')->updateOrInsert(
             ['email' => 'admin@example.com'],
             [
-                'password' => Hash::make('password123'),
+                'first_name' => 'System',
+                'last_name' => 'Admin',
+                'phone_number' => '0911111111',
+                'gender' => 'male',
+                "birthday"=> "2005-06-15",
                 'role_id' => $adminRoleId,
+                'password' => Hash::make('password123'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ]
         );
 
-        // إنشاء حساب المدير
-        User::firstOrCreate(
+        // إنشاء حساب manager إذا لم يكن موجود
+        DB::table('users')->updateOrInsert(
             ['email' => 'manager@example.com'],
             [
-                'password' => Hash::make('password123'),
+                'first_name' => 'System',
+                'last_name' => 'Manager',
+                'phone_number' => '0922222222',
+                'gender' => 'male',
+                "birthday"=> "2005-06-15",
                 'role_id' => $managerRoleId,
+                'password' => Hash::make('password123'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ]
         );
     }

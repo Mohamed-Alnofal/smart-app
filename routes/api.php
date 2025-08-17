@@ -3,10 +3,13 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\NotificationController;
 
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CourseLevelController;
+use App\Http\Controllers\ScholarshipController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Password;
@@ -27,6 +30,7 @@ Route::post('/login', [UserController::class, 'login']);
 Route::middleware('auth:api')->group(function () {
     Route::post('/complete-profile', [UserController::class, 'completeProfile']);
     Route::get('/profile', [UserController::class, 'profile']);
+    Route::put('/update-profile', [UserController::class, 'updateProfile']);//
     Route::post('/logout', [UserController::class, 'logout']);
 });
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -54,39 +58,39 @@ Route::middleware('auth:api')->group(function () {
 //     Route::post('/logout', [UserController::class, 'logout']);
 // });
 
-Route::post('/register/admin', [AdminController::class, 'registerAdmin']);
-Route::post('/login/admin', [AdminController::class, 'adminLogin']);
-// Route::get('/profile/admin', [AdminController::class, 'adminProfile']);
+// Route::post('/register/admin', [AdminController::class, 'registerAdmin']);
+// Route::post('/login/admin', [AdminController::class, 'adminLogin']);
+// // Route::get('/profile/admin', [AdminController::class, 'adminProfile']);
 
 
-Route::post('/register/manager', [ManagerController::class, 'registerManager']);
-Route::post('/login/manager', [ManagerController::class, 'managerLogin']);
+// Route::post('/register/manager', [ManagerController::class, 'registerManager']);
+// Route::post('/login/manager', [ManagerController::class, 'managerLogin']);
 
-Route::post('/register/student', [StudentController::class, 'registerStudent']);
-Route::post('/login/student', [StudentController::class, 'studentLogin']);
+// Route::post('/register/student', [StudentController::class, 'registerStudent']);
+// Route::post('/login/student', [StudentController::class, 'studentLogin']);
 
-Route::middleware('auth:api')->group(function () {
-    //Admin
-    Route::get('/profile/admin', [AdminController::class, 'adminProfile']);
-    Route::post('/logout/admin', [AdminController::class, 'adminlogout']);
-    //Manager
-    Route::get('/profile/manager', [ManagerController::class, 'managerProfile']);
-    Route::post('/logout/manager', [ManagerController::class, 'managerlogout']);
-    //Student
-    Route::get('/profile/student', [StudentController::class, 'studentProfile']);
-    Route::post('/logout/student', [StudentController::class, 'studentlogout']);
-});
+// Route::middleware('auth:api')->group(function () {
+//     //Admin
+//     Route::get('/profile/admin', [AdminController::class, 'adminProfile']);
+//     Route::post('/logout/admin', [AdminController::class, 'adminlogout']);
+//     //Manager
+//     Route::get('/profile/manager', [ManagerController::class, 'managerProfile']);
+//     Route::post('/logout/manager', [ManagerController::class, 'managerlogout']);
+//     //Student
+//     Route::get('/profile/student', [StudentController::class, 'studentProfile']);
+//     Route::post('/logout/student', [StudentController::class, 'studentlogout']);
+// });
 
 Route::post('/password/requestCode', [PasswordResetController::class, 'requestCode']);
 Route::post('/password/verifyAccount', [PasswordResetController::class, 'verifyAccount']);
 // Route::post('/password/reset-with-code', [PasswordResetController::class, 'resetWithCode']);
-Route::middleware(['auth:api', 'role:manager'])->get('/manager/profile', [ManagerController::class, 'managerProfile']);
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\CourseLevelController;
+// Route::middleware(['auth:api', 'role:manager'])->get('/manager/profile', [ManagerController::class, 'managerProfile']);
+// use App\Http\Controllers\CourseController;
+// use App\Http\Controllers\CourseLevelController;
 
-Route::middleware(['auth:api', 'role:admin,manager'])->group(function () {
-    Route::post('/courses', [CourseController::class, 'store']);
-});
+// Route::middleware(['auth:api', 'role:admin,manager'])->group(function () {
+//     Route::post('/courses', [CourseController::class, 'store']);
+// });
 
 
 
@@ -101,7 +105,7 @@ Route::middleware('auth:api')->group(function () {
     // فقط للمدير أو الأدمن
     Route::middleware('role:admin,manager')->group(function () {
     Route::post('/courses', [CourseLevelController::class, 'storeCourse']);
-    Route::post('/courses/{id}', [CourseLevelController::class, 'updateCourse']);
+    Route::post('/updateCourse/{id}', [CourseLevelController::class, 'updateCourse']);
     Route::delete('/courses/{id}', [CourseLevelController::class, 'destroyCourse']);
     });
 
@@ -122,4 +126,30 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/levels/{id}', [CourseLevelController::class, 'destroyLevel']);
     });
 });
+
+
+// scholarships
+Route::middleware('auth:api')->group(function () {
+
+    Route::get('/scholarships', [ScholarshipController::class, 'index']);
+    Route::get('/scholarships/{id}', [ScholarshipController::class, 'show']);
+    Route::get('/user/{userId}/scholarships', [ScholarshipController::class, 'userScholarships']);
+    Route::post('/applyScholarship', [ScholarshipController::class, 'applyScholarship']);
+  
+    Route::middleware('role:admin,manager')->group(function () {
+        Route::post('/scholarships', [ScholarshipController::class, 'store']);
+        Route::post('/scholarships/{id}', [ScholarshipController::class, 'update']);
+        Route::delete('/scholarships/{id}', [ScholarshipController::class, 'destroy']);
+    });
+});
+
+// Notification
+Route::middleware('auth:api')->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'getNotifications']);
+    Route::get('/notifications/unread', [NotificationController::class, 'getUnreadNotifications']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markNotificationAsRead']);
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+
+});
+
 

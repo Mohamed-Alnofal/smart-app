@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('last_name')->nullable();
             $table->string('phone_number')->nullable();
             $table->string('gender')->nullable(); // male أو female
-            $table->integer('age')->nullable();
-         $table->foreignId('role_id')
+            $table->date('birthday')->nullable();
+            $table->foreignId('role_id')
           ->constrained('roles')     // يربط بـ roles.id تلقائياً
           ->onDelete('cascade')      // حذف المستخدم إذا حذف الدور
           ->default(3);             $table->rememberToken();
