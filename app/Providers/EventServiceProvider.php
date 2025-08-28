@@ -16,8 +16,23 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         Registered::class => [
-            SendEmailVerificationNotification::class,
-        ],
+        SendEmailVerificationNotification::class,],
+
+        \App\Events\CourseCreated::class => [
+        \App\Listeners\SendCourseCreatedNotification::class,],
+        \App\Events\CourseCreated::class => [\App\Listeners\SendCourseNotificationListener::class],
+        \App\Events\CourseUpdated::class => [\App\Listeners\SendCourseNotificationListener::class],
+        \App\Events\CourseDeleted::class => [\App\Listeners\SendCourseNotificationListener::class],
+        \App\Events\LevelCreated::class => [\App\Listeners\SendCourseNotificationListener::class],
+        \App\Events\LevelUpdated::class => [\App\Listeners\SendCourseNotificationListener::class],
+        \App\Events\LevelDeleted::class => [\App\Listeners\SendCourseNotificationListener::class],
+        \App\Events\EnrollmentCreated::class => [\App\Listeners\SendCourseNotificationListener::class],
+        \App\Events\CourseClosed::class => [\App\Listeners\SendCourseNotificationListener::class],
+        \App\Events\CourseOpened::class => [\App\Listeners\SendCourseNotificationListener::class],
+        \App\Events\ScholarshipCreated::class => [\App\Listeners\SendScholarshipNotificationListener::class],
+        \App\Events\ScholarshipUpdated::class => [\App\Listeners\SendScholarshipNotificationListener::class],
+        \App\Events\ScholarshipDeleted::class => [\App\Listeners\SendScholarshipNotificationListener::class],
+        \App\Events\ScholarshipEnrolled::class => [\App\Listeners\SendScholarshipNotificationListener::class],
     ];
 
     /**

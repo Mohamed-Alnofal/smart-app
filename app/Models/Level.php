@@ -19,8 +19,11 @@ protected $fillable = [
         'start_time',
         'start_date',
         'description',
+        'days'
     ];
-
+    protected $casts = [
+        'days' => 'array', // Laravel سيعمل JSON encode/decode تلقائيًا
+    ];
     public function course()
     {
         return $this->belongsTo(Course::class);

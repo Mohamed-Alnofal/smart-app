@@ -5,11 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class student extends Model
+class PostLike extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id' ,'university_name','level'];
+    protected $fillable = [
+        'post_id',
+        'user_id',
+        'is_like',
+    ];
+
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
+    }
 
     public function user()
     {

@@ -20,6 +20,7 @@ return new class extends Migration
         $table->time('time');
         $table->enum('days', ['tue-thu-wed', 'sat-sun-mon']);
         $table->enum('learning_method', ['at-smart-foundation', 'online']);
+        $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
         $table->timestamps();
         });
     }

@@ -63,31 +63,31 @@ class PasswordResetController extends Controller
 }
 
     // // 2. التحقق من الكود وإعادة تعيين كلمة المرور
-    // public function resetWithCode(Request $request)
-    // {
-    //     $request->validate([
-    //         'email' => 'required|email',
-    //         'code' => 'required|digits:4',
-    //         'password' => 'required|string|min:6|confirmed',
-    //     ]);
+    public function resetWithCode(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'code' => 'required|digits:4',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
 
-    //     $record = DB::table('password_reset_codes')
-    //         ->where('email', $request->email)
-    //         ->where('code', $request->code)
-    //         ->where('expires_at', '>', Carbon::now())
-    //         ->first();
+        $record = DB::table('password_reset_codes')
+            ->where('email', $request->email)
+            ->where('code', $request->code)
+            ->where('expires_at', '>', Carbon::now())
+            ->first();
 
-    //     if (!$record) {
-    //         return response()->json(['message' => 'رمز غير صالح أو منتهي الصلاحية.'], 422);
-    //     }
+        if (!$record) {
+            return response()->json(['message' => 'رمز غير صالح أو منتهي الصلاحية.'], 422);
+        }
 
-    //     $user = User::where('email', $request->email)->first();
-    //     $user->update([
-    //         'password' => Hash::make($request->password),
-    //     ]);
+        $user = User::where('email', $request->email)->first();
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
 
-    //     DB::table('password_reset_codes')->where('email', $request->email)->delete();
+        DB::table('password_reset_codes')->where('email', $request->email)->delete();
 
-    //     return response()->json(['message' => 'تم تغيير كلمة المرور بنجاح.']);
-    // }
+        return response()->json(['message' => 'تم تغيير كلمة المرور بنجاح.']);
+    }
 }
