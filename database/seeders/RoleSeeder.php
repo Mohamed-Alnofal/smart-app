@@ -51,6 +51,7 @@ class RoleSeeder extends Seeder
                 "birthday"=> "2005-06-15",
                 'role_id' => $adminRoleId,
                 'password' => Hash::make('password123'),
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
@@ -67,6 +68,7 @@ class RoleSeeder extends Seeder
                 "birthday"=> "2005-06-15",
                 'role_id' => $managerRoleId,
                 'password' => Hash::make('password123'),
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]

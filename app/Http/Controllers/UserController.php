@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -143,31 +144,72 @@ class UserController extends Controller
 //     ]);
 // }
 
+// public function signUp(Request $request)
+// {
+//     $validator = Validator::make($request->all(), [
+//         // بيانات الحساب
+//         'email' => 'required|email|unique:users',
+//         'password' => 'required|string|min:6|confirmed',
+
+//         // بيانات الملف الشخصي
+//         'first_name' => 'required|string|max:255',
+//         'last_name' => 'required|string|max:255',
+//         'phone_number' => 'required|digits_between:8,15',
+//         'gender' => 'required|in:male,female',
+//         'birthday' => 'required|date|before:'.Carbon::now()->subYears(10)->format('Y-m-d').'|after:'.Carbon::now()->subYears(100)->format('Y-m-d'),
+//     ]);
+
+//     if ($validator->fails()) {
+//         return response()->json([
+//             'errors' => $validator->errors()
+//         ], 422);
+//     }
+
+//     // الحصول على role_id للطالب
+//     $studentRoleId = DB::table('roles')->where('name', 'student')->value('id');
+
+//     // إنشاء المستخدم مباشرة بكامل بياناته
+//     $user = User::create([
+//         'email' => $request->email,
+//         'password' => Hash::make($request->password),
+//         'role_id' => $studentRoleId,
+//         'first_name' => $request->first_name,
+//         'last_name' => $request->last_name,
+//         'phone_number' => $request->phone_number,
+//         'gender' => $request->gender,
+//         'birthday' => $request->birthday,
+//     ]);
+
+//     // إنشاء التوكن
+//     $token = $user->createToken('auth_token')->accessToken;
+
+//     return response()->json([
+//         'message' => 'تم إنشاء الحساب واستكمال البيانات الشخصية بنجاح.',
+//         'user_id' => $user->id,
+//         'user' => $user,
+//         'token' => $token
+//     ], 201);
+// }
+
 public function signUp(Request $request)
 {
+    // التحقق من صحة البيانات
     $validator = Validator::make($request->all(), [
-        // بيانات الحساب
         'email' => 'required|email|unique:users',
         'password' => 'required|string|min:6|confirmed',
-
-        // بيانات الملف الشخصي
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
         'phone_number' => 'required|digits_between:8,15',
         'gender' => 'required|in:male,female',
-        'birthday' => 'required|date|before:'.Carbon::now()->subYears(10)->format('Y-m-d').'|after:'.Carbon::now()->subYears(100)->format('Y-m-d'),
+        'birthday' => 'required|date',
     ]);
 
     if ($validator->fails()) {
-        return response()->json([
-            'errors' => $validator->errors()
-        ], 422);
+        return response()->json(['errors' => $validator->errors()], 422);
     }
 
-    // الحصول على role_id للطالب
+    // إنشاء المستخدم
     $studentRoleId = DB::table('roles')->where('name', 'student')->value('id');
-
-    // إنشاء المستخدم مباشرة بكامل بياناته
     $user = User::create([
         'email' => $request->email,
         'password' => Hash::make($request->password),
@@ -177,22 +219,61 @@ public function signUp(Request $request)
         'phone_number' => $request->phone_number,
         'gender' => $request->gender,
         'birthday' => $request->birthday,
+        'active' => false, // الحساب غير مفعل
     ]);
 
-    // إنشاء التوكن
-    $token = $user->createToken('auth_token')->accessToken;
+    // إنشاء كود التفعيل (6 أرقام مثلاً)
+    $verificationCode = rand(100000, 999999);
+
+    // تخزين الكود في جدول users أو جدول منفصل (يفضل جدول verification_codes)
+    $user->verification_code = $verificationCode;
+    $user->save();
+
+    // إرسال الكود على الإيميل
+    Mail::raw("رمز التفعيل الخاص بك هو: $verificationCode", function ($message) use ($user) {
+        $message->to($user->email);
+        $message->subject('تفعيل حسابك');
+    });
 
     return response()->json([
-        'message' => 'تم إنشاء الحساب واستكمال البيانات الشخصية بنجاح.',
-        'user_id' => $user->id,
-        'user' => $user,
-        'token' => $token
+        'message' => 'تم إنشاء الحساب، تحقق من بريدك الإلكتروني لإدخال رمز التفعيل.',
+        'user_id' => $user->id
     ], 201);
+}
+public function verifyEmail(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email|exists:users,email',
+        'verification_code' => 'required|digits:6',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    $user = User::where('email', $request->email)
+                ->where('verification_code', $request->verification_code)
+                ->first();
+
+    if (!$user) {
+        return response()->json(['message' => 'كود التحقق غير صحيح.'], 400);
+    }
+
+    $user->update([
+        'active' => true,
+        'verification_code' => null
+    ]);
+
+    return response()->json([
+        'message' => 'تم تفعيل الحساب بنجاح.',
+        'user' => $user
+    ]);
 }
 
 
 public function login(Request $request)
     {
+        
         // التحقق من صحة البيانات
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -210,6 +291,11 @@ public function login(Request $request)
 
         // المستخدم الحالي
         $user = Auth::user();
+
+        if (!$user->active) {
+            
+            return response()->json(['message' => 'يرجى تفعيل حسابك عبر البريد الإلكتروني'], 403);
+        }
 
         // إنشاء التوكن باستخدام Laravel Passport
         $token = $user->createToken('authToken')->accessToken;

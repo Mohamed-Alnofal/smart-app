@@ -25,8 +25,8 @@ class EnrollmentResource extends JsonResource
             'student' => [
                 // 'id' => $this->user->id,
                 'name' => $this->user->first_name . ' ' . $this->user->last_name,
-                // 'email' => $this->user->email,
-                // 'phone' => $this->user->phone_number,
+                'email' => $this->user->email,
+                'phone' => $this->user->phone_number,
             ],
             'level' => [
                 // 'id' => $this->level->id,

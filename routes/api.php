@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Hash;
 
 Route::post('/signup', [UserController::class, 'signUp']);
 Route::post('/login', [UserController::class, 'login']);
+Route::post('/verify-email', [UserController::class, 'verifyEmail']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/complete-profile', [UserController::class, 'completeProfile']);
@@ -147,7 +148,8 @@ Route::middleware('auth:api')->group(function () {
     // الطالب يقدم على منحة
     Route::post('/scholarships/{id}/apply', [ScholarshipController::class, 'apply']);
     // الطالب يشوف طلباته
-    Route::get('/my-scholarship-applications', [ScholarshipController::class, 'myApplications']);
+    Route::get('/myScholarshipApplication/{id}', [ScholarshipController::class, 'myScholarshipApplication']);
+    Route::get('/allPendingScholarshipApplication', [ScholarshipController::class, 'allPendingScholarshipApplication']);
 
 
     Route::middleware('role:admin,manager')->group(function () {
