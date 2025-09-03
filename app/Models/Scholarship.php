@@ -23,6 +23,7 @@ class Scholarship extends Model
         'country',
         'specialization',
         'image',
+        'submission_time',
     ];
 
     // العلاقة مع المستخدم

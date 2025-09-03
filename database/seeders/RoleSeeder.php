@@ -42,7 +42,7 @@ class RoleSeeder extends Seeder
     //     );
      // إنشاء حساب admin إذا لم يكن موجود
         DB::table('users')->updateOrInsert(
-            ['email' => 'admin@example.com'],
+            ['email' => 'admin@gmail.com'],
             [
                 'first_name' => 'System',
                 'last_name' => 'Admin',
@@ -51,6 +51,7 @@ class RoleSeeder extends Seeder
                 "birthday"=> "2005-06-15",
                 'role_id' => $adminRoleId,
                 'password' => Hash::make('password123'),
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
@@ -58,7 +59,7 @@ class RoleSeeder extends Seeder
 
         // إنشاء حساب manager إذا لم يكن موجود
         DB::table('users')->updateOrInsert(
-            ['email' => 'manager@example.com'],
+            ['email' => 'manager@gmail.com'],
             [
                 'first_name' => 'System',
                 'last_name' => 'Manager',
@@ -67,6 +68,7 @@ class RoleSeeder extends Seeder
                 "birthday"=> "2005-06-15",
                 'role_id' => $managerRoleId,
                 'password' => Hash::make('password123'),
+                'active' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]

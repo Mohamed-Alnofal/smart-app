@@ -36,6 +36,9 @@ protected $fillable = [
     'gender',
     'birthday',
     'role_id',
+    'active',
+    'verification_code',
+    'image',
 ];
 
 

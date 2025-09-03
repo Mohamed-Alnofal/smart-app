@@ -26,6 +26,7 @@ return new class extends Migration
         $table->string('country');
         $table->string('specialization')->nullable();
         $table->string('image')->nullable(); // لتخزين مسار الصورة
+        $table->date('submission_time')->nullable();
         $table->timestamps();
         });
     }

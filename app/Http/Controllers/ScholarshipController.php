@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ScholarshiApplicationResource;
 use App\Models\Scholarship;
 use App\Models\ScholarshipApplication;
 use Illuminate\Http\Request;
@@ -68,6 +69,8 @@ class ScholarshipController extends Controller
         'country' => 'required|string|max:255',
         'specialization' => 'nullable|string|max:255',
         'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        'submission_time' => 'required|date'
+
     ]);
 
     // ربط المنحة بالمستخدم الحالي
@@ -109,6 +112,8 @@ public function update(Request $request, $id)
         'country' => 'sometimes|required|string|max:255',
         'specialization' => 'nullable|string|max:255',
         'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        'submission_time' => 'required|date'
+
     ]);
 
     // معالجة الصورة إذا تم رفع واحدة جديدة
@@ -264,6 +269,36 @@ public function updateScholarshipStatus(Request $request, $id)
     ]);
 }
 
+public function myScholarshipApplication($scholarship_id)
+{
+    $user = auth()->user();
+
+    $scholarship_applications = ScholarshipApplication::where('user_id', $user->id)
+        ->where('scholarship_id', $scholarship_id)
+        ->get();
+
+    return response()->json([
+        'message' => 'Your enrollments for this scholarship',
+        'enrollments' => ScholarshiApplicationResource::collection($scholarship_applications)
+    ]);
+}
+
+public function allPendingScholarshipApplication()
+{
+    $user = auth()->user();
+    if (!in_array($user->role->name, ['admin', 'manager'])) {
+        return response()->json(['message' => 'This action is unauthorized.'], 403);
+    }
+
+    $pending = ScholarshipApplication::with('user', 'scholarship')
+        ->where('status', 'pending')
+        ->get();
+
+    return response()->json([
+        'message' => 'All pending scholarship enrollments',
+        'scholarship_applications' => ScholarshiApplicationResource::collection($pending)
+    ]);
+}
 
 }
 
